@@ -1,0 +1,70 @@
+{
+  "name": "mcp-google-workspace",
+  "version": "1.0.0",
+  "description": "Generic MCP server for Gmail and Google Docs — reusable across any MCP-compatible AI agent",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "auth": "tsx src/scripts/auth.ts",
+    "test": "jest --runInBand --forceExit",
+    "test:coverage": "jest --runInBand --forceExit --coverage",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "gmail",
+    "google-docs",
+    "google-workspace",
+    "ai-agent"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "google-auth-library": "^9.15.1",
+    "googleapis": "^148.0.0",
+    "pino": "^9.6.0",
+    "zod": "^3.24.2",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.9",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.6",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "module": "CommonJS",
+            "moduleResolution": "node",
+            "esModuleInterop": true,
+            "allowSyntheticDefaultImports": true
+          },
+          "diagnostics": false,
+          "isolatedModules": true
+        }
+      ]
+    },
+    "testMatch": [
+      "**/tests/**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/scripts/**"
+    ]
+  }
+}
