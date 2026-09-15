@@ -9,6 +9,10 @@ dist/
 .env.local
 .env.*.local
 
+# ─── Google OAuth Credentials (NEVER commit) ─────────────────────────────────
+docs/googleauthdoc.js
+**/googleauthdoc.js
+
 # ─── OAuth Tokens (NEVER commit) ─────────────────────────────────────────────
 .tokens/
 

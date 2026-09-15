@@ -6,9 +6,9 @@
  *   - gmail_send_email
  *   - google_docs_append_content
  *
- * Transport: StdioServerTransport (stdin/stdout)
- * Compatible with: Claude Desktop, Cursor, Windsurf, and any MCP client
- * that connects via stdio.
+ * Transport: StdioServerTransport (stdin/stdout) for local use.
+ *            StreamableHttpServerTransport for Railway/production.
+ * Compatible with: Claude Desktop, Cursor, Windsurf, and any MCP client.
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -19,12 +19,11 @@ import { handleSendEmail } from '../tools/gmail/send-email.js';
 import { handleAppendContent } from '../tools/google-docs/append-content.js';
 import { logger } from '../utils/logger.js';
 
-export async function startMcpServer(): Promise<void> {
-  const server = new McpServer({
-    name: 'mcp-google-workspace',
-    version: '1.0.0',
-  });
-
+/**
+ * Registers all MCP tools on the provided server instance.
+ * Shared between stdio (local) and HTTP (Railway) transports.
+ */
+export function setupMcpTools(server: McpServer): void {
   // ─── Tool: gmail_create_draft ──────────────────────────────────────────────
   server.tool(
     'gmail_create_draft',
@@ -143,8 +142,21 @@ Existing document content is never overwritten or deleted.`,
       };
     }
   );
+}
 
-  // ─── Start transport ───────────────────────────────────────────────────────
+/**
+ * Starts the MCP server with StdioServerTransport (local/dev mode).
+ * For Railway/production HTTP mode, see http-server.ts.
+ */
+export async function startMcpServer(): Promise<void> {
+  const server = new McpServer({
+    name: 'mcp-google-workspace',
+    version: '1.0.0',
+  });
+
+  setupMcpTools(server);
+
+  // ─── Start stdio transport ─────────────────────────────────────────────────
   const transport = new StdioServerTransport();
   await server.connect(transport);
 

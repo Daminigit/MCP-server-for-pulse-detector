@@ -92,15 +92,30 @@ export class GoogleAuthService {
   }
 
   /**
-   * Returns true if stored tokens exist on disk.
+   * Returns true if stored tokens exist — either in the GOOGLE_TOKEN_JSON
+   * environment variable (production/Railway) or on disk (local dev).
    */
   async isAuthenticated(): Promise<boolean> {
-    return existsSync(this.tokenPath);
+    return !!(process.env.GOOGLE_TOKEN_JSON) || existsSync(this.tokenPath);
   }
 
   // ─── Private helpers ──────────────────────────────────────────────────────
 
   private async loadTokens(): Promise<StoredTokens | null> {
+    // 1. Check GOOGLE_TOKEN_JSON env var first (Railway / production).
+    //    Value must be the base64-encoded contents of google-token.json.
+    const tokenEnv = process.env.GOOGLE_TOKEN_JSON;
+    if (tokenEnv) {
+      try {
+        const decoded = Buffer.from(tokenEnv, 'base64').toString('utf-8');
+        logger.info('Loaded Google tokens from GOOGLE_TOKEN_JSON env var');
+        return JSON.parse(decoded) as StoredTokens;
+      } catch {
+        logger.warn('GOOGLE_TOKEN_JSON env var is set but could not be parsed — falling back to file');
+      }
+    }
+
+    // 2. Fall back to token file (local development).
     if (!existsSync(this.tokenPath)) {
       return null;
     }
